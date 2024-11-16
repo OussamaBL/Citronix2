@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1731779973338-1" author="Youcode (generated)">
+        <createTable tableName="farms">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_farms"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="area" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731779973338-2" author="Youcode (generated)">
+        <createTable tableName="fields">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_fields"/>
+            </column>
+            <column name="area" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="farm_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731779973338-3" author="Youcode (generated)">
+        <createTable tableName="harvests">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_harvests"/>
+            </column>
+            <column name="date" type="DATETIME"/>
+            <column name="total_quantity" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="saison" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731779973338-4" author="Youcode (generated)">
+        <createTable tableName="harvests_details">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_harvestsdetails"/>
+            </column>
+            <column name="quantity" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="harvest_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731779973338-5" author="Youcode (generated)">
+        <createTable tableName="sales">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sales"/>
+            </column>
+            <column name="date" type="DATETIME"/>
+            <column name="unit_price" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_name" type="VARCHAR(255)"/>
+            <column name="harvest_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731779973338-6" author="Youcode (generated)">
+        <createTable tableName="trees">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_trees"/>
+            </column>
+            <column name="planting_date" type="DATETIME"/>
+            <column name="created_at" type="DATETIME"/>
+            <column name="field_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731779973338-7" author="Youcode (generated)">
+        <addForeignKeyConstraint baseColumnNames="farm_id" baseTableName="fields" constraintName="FK_FIELDS_ON_FARM"
+                                 referencedColumnNames="id" referencedTableName="farms"/>
+    </changeSet>
+    <changeSet id="1731779973338-8" author="Youcode (generated)">
+        <addForeignKeyConstraint baseColumnNames="harvest_id" baseTableName="harvests_details"
+                                 constraintName="FK_HARVESTSDETAILS_ON_HARVEST" referencedColumnNames="id"
+                                 referencedTableName="harvests"/>
+    </changeSet>
+    <changeSet id="1731779973338-9" author="Youcode (generated)">
+        <addForeignKeyConstraint baseColumnNames="harvest_id" baseTableName="sales" constraintName="FK_SALES_ON_HARVEST"
+                                 referencedColumnNames="id" referencedTableName="harvests"/>
+    </changeSet>
+    <changeSet id="1731779973338-10" author="Youcode (generated)">
+        <addForeignKeyConstraint baseColumnNames="field_id" baseTableName="trees" constraintName="FK_TREES_ON_FIELD"
+                                 referencedColumnNames="id" referencedTableName="fields"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,10 +1,9 @@
 package com.citronix.citronix.repository;
 
+import com.citronix.citronix.domain.Harvest;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
-public interface Harvest extends JpaRepository<Harvest, UUID> {
+public interface HarvestRepository extends JpaRepository<Harvest, UUID> {
 }

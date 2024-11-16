@@ -8,5 +8,5 @@ import java.util.UUID;
 
 
 @Repository
-public interface HarvestDetails extends JpaRepository<Harvest, UUID> {
+public interface HarvestDetailsRepository extends JpaRepository<Harvest, UUID> {
 }
