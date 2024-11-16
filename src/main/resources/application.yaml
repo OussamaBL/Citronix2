@@ -7,11 +7,12 @@ spring:
   liquibase:
     enabled: true
     change-log: db/changelog/master.yaml
-
-  server:
-    port: 8081
   datasource:
     username: Citronix
     password:
     url: jdbc:postgresql://localhost:5432/Citronix
+
+server:
+  port: 8081
+
 
