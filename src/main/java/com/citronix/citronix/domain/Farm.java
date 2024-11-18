@@ -23,7 +23,7 @@ public class Farm {
     private UUID id;
     private String name;
     private String location;
-    private double area;
+    private Double area;
     private LocalDateTime created_at;
 
     @OneToMany(mappedBy = "farm")
