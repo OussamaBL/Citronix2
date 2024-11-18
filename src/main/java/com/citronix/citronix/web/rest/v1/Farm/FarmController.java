@@ -5,6 +5,7 @@ import com.citronix.citronix.service.impl.FarmServiceImpl;
 import com.citronix.citronix.web.vm.Farm.ResponseFarmVM;
 import com.citronix.citronix.web.vm.Farm.UpdateFarmVM;
 import com.citronix.citronix.web.vm.Farm.addFarmVM;
+import com.citronix.citronix.web.vm.Field.SearchDTO;
 import com.citronix.citronix.web.vm.Mapper.Farm.FarmMapper;
 import com.citronix.citronix.web.vm.Mapper.Farm.UpdateFarmMapper;
 import jakarta.validation.Valid;
@@ -61,4 +62,12 @@ public class FarmController {
         farmServiceImpl.deleteFarm(id);
         return ResponseEntity.ok("Farm deleted successfully");
     }
+
+    @PostMapping("/findByCriteria")
+    public ResponseEntity<List<ResponseFarmVM>> findByCriteria(@RequestBody @Valid SearchDTO searchDTO){
+        List<Farm> farmList=farmServiceImpl.findByCriteria(searchDTO);
+        List<ResponseFarmVM> responseUserVMList=farmList.stream().map((farm)->farmMapper.toResponseFarmVM(farm)).collect(Collectors.toList());
+        return new ResponseEntity<>(responseUserVMList,HttpStatus.OK);
+    }
+
 }

@@ -5,7 +5,9 @@ import com.citronix.citronix.exception.Farm.FarmAlreadyExistException;
 import com.citronix.citronix.exception.Farm.FarmInvalidException;
 import com.citronix.citronix.exception.Farm.FarmNotFoundException;
 import com.citronix.citronix.repository.FarmRepository;
+import com.citronix.citronix.repository.impl.FarmRepositoryImpl;
 import com.citronix.citronix.service.FarmService;
+import com.citronix.citronix.web.vm.Field.SearchDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +17,11 @@ import java.util.UUID;
 @Service
 public class FarmServiceImpl implements FarmService {
     private final FarmRepository farmRepository;
+    private final FarmRepositoryImpl farmRepositoryImpl;
 
-    public FarmServiceImpl(FarmRepository farmRepository){
+    public FarmServiceImpl(FarmRepository farmRepository,FarmRepositoryImpl farmRepositoryImpl){
         this.farmRepository=farmRepository;
+        this.farmRepositoryImpl=farmRepositoryImpl;
     }
     @Override
     public Farm addFarm(Farm farm) {
@@ -60,5 +64,10 @@ public class FarmServiceImpl implements FarmService {
 
     public List<Farm> getFarms(){
         return farmRepository.findAll();
+    }
+
+    @Override
+    public List<Farm> findByCriteria(SearchDTO searchDTO) {
+        return farmRepositoryImpl.findByCriteria(searchDTO);
     }
 }
