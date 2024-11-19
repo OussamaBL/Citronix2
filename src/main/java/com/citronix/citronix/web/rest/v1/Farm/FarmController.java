@@ -70,4 +70,35 @@ public class FarmController {
         return new ResponseEntity<>(responseUserVMList,HttpStatus.OK);
     }
 
+
+    @PostMapping("/saveWithoutList")
+    public ResponseEntity<Map<String,Object>> saveWithoutList(@RequestBody @Valid addFarmVM addfarmvm){
+        Farm farm= farmMapper.toFarm(addfarmvm);
+        Farm farm1=farmServiceImpl.saveWithoutList(farm);
+        ResponseFarmVM responseFarmVM=farmMapper.toResponseFarmVM(farm1);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Farm added successfully");
+        response.put("data", responseFarmVM);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
+    }
+    @PostMapping("/saveWithList")
+    public ResponseEntity<Map<String,Object>> saveWithList(@RequestBody @Valid addFarmVM addfarmvm){
+        Farm farm= farmMapper.toFarm(addfarmvm);
+        Farm farm1=farmServiceImpl.saveWithList(farm);
+        ResponseFarmVM responseFarmVM=farmMapper.toResponseFarmVM(farm1);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Farm added successfully");
+        response.put("data", responseFarmVM);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
+    }
+    @GetMapping("/getFarmLess4000")
+    public ResponseEntity<Map<String,Object>> getFarmLess4000(){
+        List<Farm> farmList=farmServiceImpl.getFarmLess4000();
+        List<ResponseFarmVM> farmVMList= farmList.stream().map((farm)-> farmMapper.toResponseFarmVM(farm) ).collect(Collectors.toList());
+
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", farmVMList);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
+    }
 }
