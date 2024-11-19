@@ -3,6 +3,7 @@ package com.citronix.citronix.web.errors;
 import com.citronix.citronix.exception.Farm.FarmAlreadyExistException;
 import com.citronix.citronix.exception.Farm.FarmInvalidException;
 import com.citronix.citronix.exception.Farm.FarmNotFoundException;
+import com.citronix.citronix.exception.Tree.TreePlantingSaisonException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -36,6 +37,12 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(FarmNotFoundException.class)
     public ResponseEntity<Map<String,String>> handleFarmAlreadyExistException(FarmNotFoundException exception){
+        Map<String,String> error=new HashMap<>();
+        error.put("error",exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+    @ExceptionHandler(TreePlantingSaisonException.class)
+    public ResponseEntity<Map<String,String>> handleTreePlantingSaisonException(TreePlantingSaisonException exception){
         Map<String,String> error=new HashMap<>();
         error.put("error",exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
