@@ -95,8 +95,6 @@ public class FarmController {
     public ResponseEntity<Map<String,Object>> getFarmLess4000(){
         List<Farm> farmList=farmServiceImpl.getFarmLess4000();
         List<ResponseFarmVM> farmVMList= farmList.stream().map((farm)-> farmMapper.toResponseFarmVM(farm) ).collect(Collectors.toList());
-
-
         Map<String, Object> response = new HashMap<>();
         response.put("data", farmVMList);
         return new ResponseEntity<>(response,HttpStatus.CREATED);

@@ -64,6 +64,7 @@ public class FarmServiceImpl implements FarmService {
         if(id==null) throw new RuntimeException("id is null");
         Optional<Farm> farm=farmRepository.findById(id);
         farm.orElseThrow( ()-> new FarmNotFoundException("found not exists with this id"));
+        farm.get().getFieldList().forEach(field -> { fieldServiceImpl.deleteField(field.getId()); });
         farmRepository.delete(farm.get());
     }
 
