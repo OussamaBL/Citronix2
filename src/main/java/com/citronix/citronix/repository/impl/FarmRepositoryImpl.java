@@ -34,4 +34,5 @@ public class FarmRepositoryImpl {
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
+
 }

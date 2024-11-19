@@ -1,6 +1,7 @@
 package com.citronix.citronix.service.impl;
 
 import com.citronix.citronix.domain.Farm;
+import com.citronix.citronix.domain.Field;
 import com.citronix.citronix.exception.Farm.FarmAlreadyExistException;
 import com.citronix.citronix.exception.Farm.FarmInvalidException;
 import com.citronix.citronix.exception.Farm.FarmNotFoundException;
@@ -10,18 +11,22 @@ import com.citronix.citronix.service.FarmService;
 import com.citronix.citronix.web.vm.Field.SearchDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class FarmServiceImpl implements FarmService {
     private final FarmRepository farmRepository;
+    private final FieldServiceImpl fieldServiceImpl;
     private final FarmRepositoryImpl farmRepositoryImpl;
 
-    public FarmServiceImpl(FarmRepository farmRepository,FarmRepositoryImpl farmRepositoryImpl){
+    public FarmServiceImpl(FarmRepository farmRepository,FarmRepositoryImpl farmRepositoryImpl,FieldServiceImpl fieldServiceImpl){
         this.farmRepository=farmRepository;
         this.farmRepositoryImpl=farmRepositoryImpl;
+        this.fieldServiceImpl=fieldServiceImpl;
     }
     @Override
     public Farm addFarm(Farm farm) {
@@ -59,6 +64,7 @@ public class FarmServiceImpl implements FarmService {
         if(id==null) throw new RuntimeException("id is null");
         Optional<Farm> farm=farmRepository.findById(id);
         farm.orElseThrow( ()-> new FarmNotFoundException("found not exists with this id"));
+        farm.get().getFieldList().forEach(field -> { fieldServiceImpl.deleteField(field.getId()); });
         farmRepository.delete(farm.get());
     }
 
@@ -69,5 +75,28 @@ public class FarmServiceImpl implements FarmService {
     @Override
     public List<Farm> findByCriteria(SearchDTO searchDTO) {
         return farmRepositoryImpl.findByCriteria(searchDTO);
+    }
+
+
+    public Farm saveWithoutList(Farm farm){
+        if(farm.getFieldList()!=null) throw new RuntimeException("field list not empty");
+        return this.addFarm(farm);
+    }
+    public Farm saveWithList(Farm farm){
+        if(farm.getFieldList().isEmpty()) throw new RuntimeException("field list empty");
+        farm.getFieldList().forEach(field -> {
+            field.setFarm(farm);
+        });
+        return farmRepository.save(farm);
+    }
+
+    public List<Farm> getFarmLess4000(){
+        List<Farm> farmList=farmRepository.findAll();
+        List<Farm> farmList1= new ArrayList<>();
+        farmList.forEach(farm -> {
+            double sum= farm.getFieldList().stream().mapToDouble(Field::getArea).sum();
+            if(sum<4000) farmList1.add(farm);
+        });
+        return farmList1;
     }
 }
