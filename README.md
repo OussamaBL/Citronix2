@@ -3,7 +3,7 @@
 Citronix is a comprehensive farm management application tailored for lemon farms. It streamlines farm operations, including production, harvest tracking, sales management, and client communication, ensuring optimal productivity and seamless operations.
 
 ### Api
-1. Clone Documentation
+1. Api Documentation
    ```bash
    https://documenter.getpostman.com/view/33206766/2sAYBUDsPY
 ## Features
