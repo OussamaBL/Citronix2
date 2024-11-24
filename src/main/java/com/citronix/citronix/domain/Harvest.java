@@ -29,7 +29,7 @@ public class Harvest {
     @Enumerated(EnumType.STRING)
     private Saison saison;
 
-    @OneToMany(mappedBy = "harvest")
+    @OneToMany(mappedBy = "harvest",cascade = CascadeType.ALL)
     private List<HarvestDetails> harvestDetailsList;
 
     @OneToMany(mappedBy = "harvest")
