@@ -41,4 +41,12 @@ public class Tree {
         if(this.getAge()>10) return 20;
         return 0;
     }
+    public boolean isPlantingSeason() {
+        if (this.planting_date == null) {
+            return false;
+        }
+        int month = this.planting_date.getMonthValue();
+        if(month >= 3 && month <= 5) return true;
+        else return false;
+    }
 }

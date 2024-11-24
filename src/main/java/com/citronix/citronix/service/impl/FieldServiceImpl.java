@@ -36,6 +36,16 @@ public class FieldServiceImpl implements FieldService {
         return fieldRepository.save(field);
     }
 
+    public Field saveField(Field field) {
+        Farm farm = farmRepository.findById(field.getFarm().getId()).orElseThrow(() ->
+                new FarmNotFoundException("Farm not found"));
+        Field field1=new Field();
+        field1.setArea(field.getArea());
+        validateField(farm, field1);
+        field1.setFarm(farm);
+        return fieldRepository.save(field1);
+    }
+
     @Override
     public Field updateField(Field field) {
         Field existingField = fieldRepository.findById(field.getId()).orElseThrow(() ->
