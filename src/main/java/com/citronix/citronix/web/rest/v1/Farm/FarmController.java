@@ -31,9 +31,9 @@ public class FarmController {
     @GetMapping("/allFarms")
     public ResponseEntity<Map<String,Object>> allFarms(){
         List<Farm> farmList =farmServiceImpl.getFarms();
-        farmList.stream().map((farm -> farmMapper.toResponseFarmVM(farm) )).collect(Collectors.toList());
+        List<ResponseFarmVM> responseFarmVMList= farmList.stream().map((farm -> farmMapper.toResponseFarmVM(farm) )).collect(Collectors.toList());
         Map<String, Object> response = new HashMap<>();
-        response.put("data", farmList);
+        response.put("data", responseFarmVMList);
         return new ResponseEntity<>(response,HttpStatus.FOUND);
     }
     @PostMapping("/addFarm")
