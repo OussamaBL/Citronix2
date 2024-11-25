@@ -12,5 +12,5 @@ public class ResponseSaleVM {
     private double unit_price;
     private double quantity;
     private String client_name;
-    private UUID harvestId;
+    //private UUID harvest_id;
 }
