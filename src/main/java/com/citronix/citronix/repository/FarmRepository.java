@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
 @Repository
 public interface FarmRepository extends JpaRepository<Farm, UUID> {
     boolean existsByName(String name);
