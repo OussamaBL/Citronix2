@@ -53,6 +53,7 @@ public class TreeServiceImpl implements TreeService {
         tree.orElseThrow(()-> new TreeNotFoundException("Tree not found"));
         treeRepository.delete(tree.get());
     }
+    @Override
     public List<Tree> findAllTreesByField(UUID field_id){
         Optional<Field> field=fieldRepository.findById(field_id);
         field.orElseThrow(()-> new FieldNotFoundException("field not found"));

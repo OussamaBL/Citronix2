@@ -66,6 +66,7 @@ class FieldServiceImplTest {
         assertNotNull(result);
         assertEquals(field.getArea(), result.getArea());
         assertEquals(farm.getId(), result.getFarm().getId());
+
         verify(farmRepository).findById(farm.getId());
         verify(fieldRepository).save(any(Field.class));
     }
