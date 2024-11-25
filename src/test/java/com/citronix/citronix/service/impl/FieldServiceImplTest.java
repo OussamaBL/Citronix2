@@ -2,13 +2,17 @@ package com.citronix.citronix.service.impl;
 
 import com.citronix.citronix.domain.Farm;
 import com.citronix.citronix.domain.Field;
+import com.citronix.citronix.exception.Farm.FarmNotFoundException;
+import com.citronix.citronix.exception.Field.FieldNotFoundException;
 import com.citronix.citronix.repository.FarmRepository;
 import com.citronix.citronix.repository.FieldRepository;
+import com.citronix.citronix.web.vm.Field.AddFieldVM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -27,127 +31,151 @@ class FieldServiceImplTest {
 
     @Mock
     private FarmRepository farmRepository;
+
     @InjectMocks
     private FieldServiceImpl fieldService;
 
-    private Field field;
     private Farm farm;
+    private Field field;
+    private AddFieldVM addFieldVM;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
         farm = new Farm();
         farm.setId(UUID.randomUUID());
-        farm.setArea(50.);
-        farm.setFieldList(new ArrayList<>());
+        farm.setArea(100.0);
 
         field = new Field();
         field.setId(UUID.randomUUID());
-        field.setArea(20.);
+        field.setArea(10.0);
         field.setFarm(farm);
-        field.setTreeList(new ArrayList<>());
+
+        addFieldVM = new AddFieldVM();
+        addFieldVM.setFarm_id(farm.getId());
+        addFieldVM.setArea(10.0);
     }
 
     @Test
-    void testSave_Success() {
+    public void testAddField_Success() {
+        when(farmRepository.findById(farm.getId())).thenReturn(Optional.of(farm));
         when(fieldRepository.save(any(Field.class))).thenReturn(field);
 
-        Field savedfield = fieldService.saveField(field);
+        Field result = fieldService.addField(addFieldVM);
 
-        assertNotNull(savedfield);
-        assertEquals(farm, savedfield.getFarm());
-        assertTrue(farm.getFieldList().contains(savedfield));
-        verify(fieldRepository).save(field);
+        assertNotNull(result);
+        assertEquals(field.getArea(), result.getArea());
+        assertEquals(farm.getId(), result.getFarm().getId());
+        verify(farmRepository).findById(farm.getId());
+        verify(fieldRepository).save(any(Field.class));
     }
 
     @Test
-    void testSave_Nullfarm() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            fieldService.saveField(field);
+    public void testAddField_FarmNotFound() {
+        when(farmRepository.findById(farm.getId())).thenReturn(Optional.empty());
+
+        FarmNotFoundException exception = assertThrows(FarmNotFoundException.class, () -> {
+            fieldService.addField(addFieldVM);
         });
+
+        assertEquals("Farm not found", exception.getMessage());
     }
 
     @Test
-    void testGetfieldId_Success() {
-        when(fieldRepository.findById(1)).thenReturn(Optional.of(field));
+    public void testUpdateField_Success() {
+        when(fieldRepository.findById(field.getId())).thenReturn(Optional.of(field));
+        when(farmRepository.findById(farm.getId())).thenReturn(Optional.of(farm));
+        when(fieldRepository.save(any(Field.class))).thenReturn(field);
 
-        field foundfield = fieldService.getfieldId(1);
+        field.setArea(15.0);
+        Field updatedField = fieldService.updateField(field);
 
-        assertNotNull(foundfield);
-        assertEquals(1, foundfield.getId());
-        verify(fieldRepository).findById(1);
+        assertEquals(15.0, updatedField.getArea());
+        verify(fieldRepository).findById(field.getId());
+        verify(fieldRepository).save(any(Field.class));
     }
 
     @Test
-    void testGetfieldId_NotFound() {
-        when(fieldRepository.findById(999)).thenReturn(Optional.empty());
+    public void testUpdateField_FieldNotFound() {
+        when(fieldRepository.findById(field.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
-            fieldService.getfieldId(999);
+        FieldNotFoundException exception = assertThrows(FieldNotFoundException.class, () -> {
+            fieldService.updateField(field);
         });
+
+        assertEquals("Field not found", exception.getMessage());
     }
 
     @Test
-    void testDelete_Success() {
-        fieldService.delete(field);
+    public void testDeleteField_Success() {
+        when(fieldRepository.findById(field.getId())).thenReturn(Optional.of(field));
 
-        verify(arbreService).deleteByfield(field);
+        fieldService.deleteField(field.getId());
+
+        verify(fieldRepository).findById(field.getId());
         verify(fieldRepository).delete(field);
     }
 
     @Test
-    void testDelete_Nullfield() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            fieldService.delete(null);
+    public void testDeleteField_FieldNotFound() {
+        when(fieldRepository.findById(field.getId())).thenReturn(Optional.empty());
+
+        FieldNotFoundException exception = assertThrows(FieldNotFoundException.class, () -> {
+            fieldService.deleteField(field.getId());
         });
+
+        assertEquals("Field not found", exception.getMessage());
     }
 
     @Test
-    void testUpdate_Success() {
-        field newfield = new field();
-        newfield.setSuperficie(30.0f);
+    public void testSaveField_Success() {
+        when(farmRepository.findById(farm.getId())).thenReturn(Optional.of(farm));
+        when(fieldRepository.save(any(Field.class))).thenReturn(field);
 
-        when(fieldRepository.findById(1)).thenReturn(Optional.of(field));
-        when(fieldRepository.save(any(field.class))).thenReturn(field);
+        Field result = fieldService.saveField(field);
 
-        field updatedfield = fieldService.update(newfield, 1);
-
-        assertNotNull(updatedfield);
-        assertEquals(30.0f, updatedfield.getSuperficie());
-        verify(fieldRepository).save(field);
+        assertNotNull(result);
+        assertEquals(field.getArea(), result.getArea());
+        assertEquals(farm.getId(), result.getFarm().getId());
+        verify(farmRepository).findById(farm.getId());
+        verify(fieldRepository).save(any(Field.class));
     }
 
     @Test
-    void testUpdate_SuperficieDepasseMoitie() {
-        field newfield = new field();
-        newfield.setSuperficie(60.0f);
+    public void testValidateField_AreaTooSmall() {
+        field.setArea(0.05);
 
-        when(fieldRepository.findById(1)).thenReturn(Optional.of(field));
-
-        assertThrows(RuntimeException.class, () -> {
-            fieldService.update(newfield, 1);
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            fieldService.saveField(field);
         });
+
+        assertEquals("Field area must be at least 0.1 hectares (1,000 m²)", exception.getMessage());
     }
 
     @Test
-    void testCalculerSommeSuperficiesfields() {
-        List<field> fields = new ArrayList<>();
-        field field1 = new field();
-        field1.setSuperficie(20.0f);
-        field field2 = new field();
-        field2.setSuperficie(30.0f);
-        fields.add(field1);
-        fields.add(field2);
-        farm.setfields(fields);
+    public void testValidateField_AreaTooLarge() {
+        field.setArea(110.0); // larger than the farm's area
 
-        Float somme = fieldService.calculerSommeSuperficiesfields(farm);
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            fieldService.saveField(field);
+        });
 
-        assertEquals(50.0f, somme);
+        assertEquals("Total field area must be less than the farm's total area", exception.getMessage());
     }
 
     @Test
-    void testCalculerSommeSuperficiesfields_Nullfarm() {
-        Float somme = fieldService.calculerSommeSuperficiesfields(null);
+    public void testValidateField_TooManyFields() {
+        farm.setFieldList(new ArrayList<>());
+        for (int i = 0; i < 10; i++) {
+            farm.getFieldList().add(new Field());
+        }
 
-        assertEquals(0f, somme);
+        field.setArea(5.0);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            fieldService.saveField(field);
+        });
+
+        assertEquals("A farm cannot have more than 10 fields", exception.getMessage());
     }
 }
