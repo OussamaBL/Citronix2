@@ -11,5 +11,14 @@ public interface FarmService {
     Farm addFarm(Farm farm);
     Farm updateFarm(Farm farm);
     void deleteFarm(UUID id);
+
+    List<Farm> getFarms();
+
     List<Farm> findByCriteria(SearchDTO searchDTO);
+
+    Farm saveWithoutList(Farm farm);
+
+    Farm saveWithList(Farm farm);
+
+    List<Farm> getFarmLess4000();
 }

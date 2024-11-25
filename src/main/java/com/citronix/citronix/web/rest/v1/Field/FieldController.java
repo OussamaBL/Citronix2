@@ -1,7 +1,7 @@
 package com.citronix.citronix.web.rest.v1.Field;
 
 import com.citronix.citronix.domain.Field;
-import com.citronix.citronix.service.impl.FieldServiceImpl;
+import com.citronix.citronix.service.FieldService;
 import com.citronix.citronix.web.vm.Field.AddFieldVM;
 import com.citronix.citronix.web.vm.Field.FieldResponseVM;
 import com.citronix.citronix.web.vm.Field.UpdateFieldVM;
@@ -19,19 +19,19 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/fields")
 public class FieldController {
-    private final FieldServiceImpl fieldServiceImpl;
+    private final FieldService fieldService;
     private final FieldMapper fieldMapper;
     private final UpdateFieldMapper updateFieldMapper;
 
-    public FieldController(FieldServiceImpl fieldServiceImpl, FieldMapper fieldMapper,UpdateFieldMapper updateFieldMapper) {
-        this.fieldServiceImpl = fieldServiceImpl;
+    public FieldController(FieldService fieldService, FieldMapper fieldMapper,UpdateFieldMapper updateFieldMapper) {
+        this.fieldService = fieldService;
         this.fieldMapper = fieldMapper;
         this.updateFieldMapper = updateFieldMapper;
     }
 
     @PostMapping("/save")
     public ResponseEntity<FieldResponseVM> save(@RequestBody @Valid AddFieldVM addFieldVM) {
-        Field savedField = fieldServiceImpl.addField(addFieldVM);
+        Field savedField = fieldService.addField(addFieldVM);
         FieldResponseVM response = fieldMapper.toResponseFieldVM(savedField);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -41,28 +41,28 @@ public class FieldController {
                                                   @RequestBody @Valid UpdateFieldVM updateFieldVM) {
         Field field = updateFieldMapper.toField(updateFieldVM);
         field.setId(fieldUuid);
-        Field updatedField = fieldServiceImpl.updateField(field);
+        Field updatedField = fieldService.updateField(field);
         FieldResponseVM fieldResponseVM = fieldMapper.toResponseFieldVM(updatedField);
         return new ResponseEntity<>(fieldResponseVM, HttpStatus.OK);
     }
 
     @GetMapping("/find/{fieldUuid}")
     public ResponseEntity<FieldResponseVM> findById(@PathVariable UUID fieldUuid) {
-        Field field = fieldServiceImpl.findById(fieldUuid);
+        Field field = fieldService.findById(fieldUuid);
         FieldResponseVM fieldResponseVM = fieldMapper.toResponseFieldVM(field);
         return new ResponseEntity<>(fieldResponseVM, HttpStatus.OK);
     }
 
     @GetMapping("/all/{farmUuid}")
     public ResponseEntity<Page<FieldResponseVM>> findAllByFarm(@PathVariable UUID farmUuid, Pageable pageable) {
-        Page<Field> fields = fieldServiceImpl.findAllByFarm(farmUuid, pageable);
+        Page<Field> fields = fieldService.findAllByFarm(farmUuid, pageable);
         Page<FieldResponseVM> fieldResponseVMS = fields.map(fieldMapper::toResponseFieldVM);
         return new ResponseEntity<>(fieldResponseVMS, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{fieldUuid}")
     public ResponseEntity<String> delete(@PathVariable UUID fieldUuid) {
-        fieldServiceImpl.deleteField(fieldUuid);
+        fieldService.deleteField(fieldUuid);
         return new ResponseEntity<>("Field deleted successfully", HttpStatus.OK);
     }
 }

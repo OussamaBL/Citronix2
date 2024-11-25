@@ -1,7 +1,7 @@
 package com.citronix.citronix.web.rest.v1.Tree;
 
 import com.citronix.citronix.domain.Tree;
-import com.citronix.citronix.service.impl.TreeServiceImpl;
+import com.citronix.citronix.service.TreeService;
 import com.citronix.citronix.web.vm.Mapper.Tree.TreeMapper;
 import com.citronix.citronix.web.vm.Tree.ResponseTreeVM;
 import com.citronix.citronix.web.vm.Tree.addTreeVM;
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/trees")
 public class TreeController {
-    private final TreeServiceImpl treeServiceImpl;
+    private final TreeService treeService;
     private final TreeMapper treeMapper;
 
-    public TreeController(TreeServiceImpl treeServiceImpl, TreeMapper treeMapper) {
-        this.treeServiceImpl = treeServiceImpl;
+    public TreeController(TreeService treeService, TreeMapper treeMapper) {
+        this.treeService = treeService;
         this.treeMapper = treeMapper;
     }
 
@@ -29,14 +29,14 @@ public class TreeController {
     @PostMapping("/save/{fieldUuid}")
     public ResponseEntity<ResponseTreeVM> saveTree(@PathVariable UUID fieldUuid, @RequestBody @Valid addTreeVM addtreeVM) {
         Tree tree=treeMapper.toTree(addtreeVM);
-        Tree savedTree = treeServiceImpl.addTree(fieldUuid, tree);
+        Tree savedTree = treeService.addTree(fieldUuid, tree);
         ResponseTreeVM response = treeMapper.toResponseTreeVM(savedTree);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/all/{fieldUuid}")
     public ResponseEntity<List<ResponseTreeVM>> getAllTreesByField(@PathVariable UUID fieldUuid) {
-        List<Tree> trees = treeServiceImpl.findAllTreesByField(fieldUuid);
+        List<Tree> trees = treeService.findAllTreesByField(fieldUuid);
         List<ResponseTreeVM> response = trees.stream()
                 .map(treeMapper::toResponseTreeVM)
                 .collect(Collectors.toList());
@@ -45,7 +45,7 @@ public class TreeController {
 
     @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<String> deleteTree(@PathVariable UUID uuid) {
-        treeServiceImpl.deleteTree(uuid);
+        treeService.deleteTree(uuid);
         return ResponseEntity.ok("Tree deleted successfully.");
     }
 }

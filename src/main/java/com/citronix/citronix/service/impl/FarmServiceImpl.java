@@ -8,6 +8,7 @@ import com.citronix.citronix.exception.Farm.FarmNotFoundException;
 import com.citronix.citronix.repository.FarmRepository;
 import com.citronix.citronix.repository.impl.FarmRepositoryImpl;
 import com.citronix.citronix.service.FarmService;
+import com.citronix.citronix.service.FieldService;
 import com.citronix.citronix.web.vm.Field.SearchDTO;
 import org.springframework.stereotype.Service;
 
@@ -15,18 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class FarmServiceImpl implements FarmService {
     private final FarmRepository farmRepository;
-    private final FieldServiceImpl fieldServiceImpl;
+    private final FieldService fieldService;
     private final FarmRepositoryImpl farmRepositoryImpl;
 
-    public FarmServiceImpl(FarmRepository farmRepository,FarmRepositoryImpl farmRepositoryImpl,FieldServiceImpl fieldServiceImpl){
+    public FarmServiceImpl(FarmRepository farmRepository,FarmRepositoryImpl farmRepositoryImpl,FieldService fieldService){
         this.farmRepository=farmRepository;
         this.farmRepositoryImpl=farmRepositoryImpl;
-        this.fieldServiceImpl=fieldServiceImpl;
+        this.fieldService=fieldService;
     }
     @Override
     public Farm addFarm(Farm farm) {
@@ -64,10 +64,10 @@ public class FarmServiceImpl implements FarmService {
         if(id==null) throw new RuntimeException("id is null");
         Optional<Farm> farm=farmRepository.findById(id);
         farm.orElseThrow( ()-> new FarmNotFoundException("found not exists with this id"));
-        farm.get().getFieldList().forEach(field -> { fieldServiceImpl.deleteField(field.getId()); });
+        farm.get().getFieldList().forEach(field -> { fieldService.deleteField(field.getId()); });
         farmRepository.delete(farm.get());
     }
-
+    @Override
     public List<Farm> getFarms(){
         return farmRepository.findAll();
     }
@@ -77,11 +77,12 @@ public class FarmServiceImpl implements FarmService {
         return farmRepositoryImpl.findByCriteria(searchDTO);
     }
 
-
+    @Override
     public Farm saveWithoutList(Farm farm){
         if(farm.getFieldList()!=null) throw new RuntimeException("field list not empty");
         return this.addFarm(farm);
     }
+    @Override
     public Farm saveWithList(Farm farm){
         if(farm.getFieldList().isEmpty()) throw new RuntimeException("field list empty");
         farm.getFieldList().forEach(field -> {
@@ -89,7 +90,7 @@ public class FarmServiceImpl implements FarmService {
         });
         return farmRepository.save(farm);
     }
-
+    @Override
     public List<Farm> getFarmLess4000(){
         List<Farm> farmList=farmRepository.findAll();
         List<Farm> farmList1= new ArrayList<>();
